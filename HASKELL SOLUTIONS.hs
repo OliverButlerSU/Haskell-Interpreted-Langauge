@@ -1,3 +1,5 @@
+import Data.List
+
 data TileExp = Tile [String]
     deriving (Show,Eq)
 
@@ -92,14 +94,16 @@ reflectTileXY (tile) = reflectTileY $ reflectTileX tile
 
 
 
+--Used to Pretty Print a tile (OLD MAYBE USE THO??)
+--prettyPrint :: TileExp -> IO ()
+--prettyPrint (Tile [x]) = putStrLn $ id x
+--prettyPrint (Tile (x:xs)) = do
+--			putStrLn $ id x
+--			prettyPrint (Tile xs)
+
 --Used to Pretty Print a tile
 prettyPrint :: TileExp -> IO ()
-prettyPrint (Tile [x]) = putStrLn $ id x
-prettyPrint (Tile (x:xs)) = do
-			putStrLn $ id x
-			prettyPrint (Tile xs)
-
-
+prettyPrint (Tile xs) = putStrLn $ id $ intercalate "\n" xs
 
 
 --question1 (Tile ["1"]) (Tile ["0"])
