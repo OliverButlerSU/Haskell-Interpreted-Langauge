@@ -9,14 +9,39 @@ import Tokens
 %token
 --    tileLine { TokenTileLine _ $$ }
     int    { TokenInt _ $$ } 
---     doNothing { TokenDoNothing _ }
+    doNothing { TokenDoNothing _ }
 
+    --Basic code syntax
     '='    { TokenEq _ }
     '('    { TokenLParen _ } 
     ')'    { TokenRParen _ }
+    '{'    { TokenLSquig _ }
+    '}'    { TokenRSquig _ }
     ';'    { TokenSemiColon _ }
     ','    { TokenComma _ }
 
+    --Boolean Logic
+    true   { TokenTrue _ }
+    false  { TokenFalse _ }
+    '&&'   { TokenAnd _ }
+    '||'   { TokenOr _ }
+    '!'    { TokenNot _ }
+    '<'    { TokenLessThan _ }
+    '>'    { TokenMoreThan _ }
+
+    --Integer Logic
+    '+'    { TokenPlus _ }
+    '-'    { TokenMinus _ }
+    '*'    { TokenTimes _ }
+    '/'    { TokenDiv _ }
+    '^'    { TokenExponential _ }
+
+    --If/While
+    if     { TokenIf _ }
+    while  { TokenWhile _ }
+    else   { TokenElse _ }
+
+    --Tile Functions:
     combineTilesRight { TokenCTR _ }
     combineTilesDown  { TokenCTD _ }
     duplicateTileRight { TokenDTR _ }
@@ -32,25 +57,57 @@ import Tokens
     reflectTileXY { TokenRTXY _ }
     print { TokenPrint _ }
 
+    --Variable Name
     tileVar    { TokenTileVar _ $$ }
 
 
+%left '&&' '||'
+%left '!'
+%left '+' '-' 
+%left '*' '/'
+%left '^'
+%left NEG
 %left ';'
-%nonassoc int var '(' ')' '.' ','
+%nonassoc if
+%nonassoc while
+%nonassoc else
+%nonassoc '<' '>'
+%nonassoc int true false doNothing '{' '}' '(' ')' '.' ','
 %nonassoc tileVar
 --$nonassoc tileline
---%nonassoc doNothing
 
 %% 
 MultiExp : Exp ';' MultiExp                             { MultiExpr $1 $3}
          | Exp ';'                                      { $1 }
 
-Exp : '(' Exp ')'                                       { $2 } 
+Exp : '(' Exp ')'                                                   { $2 }
+    | if '(' ExpBool ')' '{' MultiExp '}' else '{' MultiExp '}'     { ExpIf $3 $6 $10 } 
+    | while '(' ExpBool ')' '{' MultiExp '}'		                { ExpWhile $3 $6 }
     | tileVar '=' ExpTile       		                { ExpSetTileVar $1 $3 }
     | print ExpTile                                     { ExpPrint $2 }
+    | doNothing                                         { ExpDoNothing }
 
 ExpInt : int                                            { IntVal $1}
+       | '-' ExpInt %prec NEG      			            { IntNegate $2 } 
+       | ExpInt '+' ExpInt            			        { IntPlus $1 $3 } 
+       | ExpInt '-' ExpInt            		            { IntMinus $1 $3 } 
+       | ExpInt '*' ExpInt            			        { IntTimes $1 $3 } 
+       | ExpInt '/' ExpInt            			        { IntDivide $1 $3 }
+       | ExpInt '^' ExpInt	     			            { IntExponential $1 $3 } 
        | '(' ExpInt ')'                                 { $2 }
+
+ExpBool : true                                  { BoolTrue }
+        | false                                 { BoolFalse }
+        | ExpBool '&&' ExpBool                  { BoolAnd $1 $3 }
+        | ExpBool '||' ExpBool                  { BoolOr $1 $3 }
+        | '!' ExpBool                           { BoolNot $2 }
+        | ExpInt '<' ExpInt                     { BoolLessThan $1 $3 }
+        | ExpInt '<' '=' ExpInt                 { BoolLessEqualThan $1 $4 }
+        | ExpInt '>' ExpInt                     { BoolMoreThan $1 $3 }
+        | ExpInt '>' '=' ExpInt                 { BoolMoreEqualThan $1 $4 }
+        | ExpInt '=' '=' ExpInt                 { BoolEqual $1 $4 }
+        | ExpInt '!' '=' ExpInt                 { BoolNotEqual $1 $4 }
+        | '(' ExpBool ')'                       { $2 } 
 
 ExpTile : tileVar                                       { TileVar $1 }
         | combineTilesRight '(' ExpTile ',' ExpTile ')' { TileCTR $3 $5 }
@@ -66,6 +123,7 @@ ExpTile : tileVar                                       { TileVar $1 }
         | reflectTileX '(' ExpTile ')'                  { TileRTX $3 }
         | reflectTileY '(' ExpTile ')'                  { TileRTY $3 }
         | reflectTileXY '(' ExpTile ')'                 { TileRTXY $3 }
+        | '(' ExpTile ')'                               { $2 } 
 
 { 
 parseError :: [Token] -> a
@@ -75,9 +133,31 @@ parseError (t:ts) = error ("Parse error at line:column " ++ (tokenPosn t))
 data Exp = ExpSetTileVar String ExpTile
          | MultiExpr Exp Exp
          | ExpPrint ExpTile
+         | ExpIf ExpBool Exp Exp
+         | ExpWhile ExpBool Exp
+         | ExpDoNothing
+    deriving (Show,Eq)
+
+data ExpBool = BoolTrue
+             | BoolFalse
+             | BoolAnd ExpBool ExpBool
+             | BoolOr ExpBool ExpBool
+             | BoolNot ExpBool
+             | BoolLessThan ExpInt ExpInt
+             | BoolLessEqualThan ExpInt ExpInt
+             | BoolMoreThan ExpInt ExpInt
+             | BoolMoreEqualThan ExpInt ExpInt
+             | BoolEqual ExpInt ExpInt
+             | BoolNotEqual ExpInt ExpInt
     deriving (Show,Eq)
 
 data ExpInt = IntVal Int
+            | IntNegate ExpInt
+            | IntPlus ExpInt ExpInt
+            | IntMinus ExpInt ExpInt
+            | IntTimes ExpInt ExpInt
+            | IntDivide ExpInt ExpInt
+            | IntExponential ExpInt ExpInt
     deriving (Show,Eq)
 
 data ExpTile = TileVar String

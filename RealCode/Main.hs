@@ -1,6 +1,6 @@
 import Tokens
 import Grammar
-import Evaluator
+--import Evaluator
 import System.Environment
 import Control.Exception
 import System.IO
@@ -15,8 +15,8 @@ main' = do (fileName : _ ) <- getArgs
            putStrLn ("Lexed as \n" ++ (show lexedProg) ++ "\n")
 	   let parsedProg = (parseCalc lexedProg)
            putStrLn ("Parsed as \n : " ++ (show parsedProg) ++ "\n")
-	   let evalProg = evaluateExp parsedProg (ExpDoNull, [("Test", 1)])
-	   putStrLn ("Evaluated as \n : " ++ (show evalProg) ++ "\n")
+	   --let evalProg = evaluateExp parsedProg (ExpDoNull, [("Test", 1)])
+	   --putStrLn ("Evaluated as \n : " ++ (show evalProg) ++ "\n")
 
 noParse :: ErrorCall -> IO ()
 noParse e = do let err =  show e

@@ -11,21 +11,43 @@ $alpha = [a-zA-Z]
 
 tokens :-
 
-
   $white+       ; --Ignore white space
   "--".*        ; --Comments
---  $binary+ { (\p s -> TokenTileLine p s) }
 
   $digit+	{ (\p s -> TokenInt p (read s)) }
---  doNothing  { (\p s -> TokenDoNothing p) } --Does nothing
+  doNothing  { (\p s -> TokenDoNothing p) } --Does nothing
 
 
   --Basic code syntax
   \=			{ (\p s -> TokenEq p ) }
   \(			{ (\p s -> TokenLParen p) }
   \)			{ (\p s -> TokenRParen p) }
+  \{      { (\p s -> TokenLSquig p) }
+  \}      { (\p s -> TokenRSquig p) }
   \;      { (\p s -> TokenSemiColon p) }
   \,      { (\p s -> TokenComma p) }
+
+  --Boolean Logic
+  true		{ (\p s -> TokenTrue p) }
+  false   { (\p s -> TokenFalse p) }
+  "&&"    { (\p s -> TokenAnd p) }
+  "||"    { (\p s -> TokenOr p) }
+  "!"     { (\p s -> TokenNot p) }
+  \<			{ (\p s -> TokenLessThan p) }
+  \>      { (\p s -> TokenMoreThan p) }
+
+
+  --Integer Logic
+  \+			{ (\p s -> TokenPlus p) }
+  \-			{ (\p s -> TokenMinus p) }
+  \*			{ (\p s -> TokenTimes p) }
+  \/			{ (\p s -> TokenDiv p) }
+  \^			{ (\p s -> TokenExponential p) }
+
+  --If/While
+  if			{ (\p s -> TokenIf p) }
+  while		{ (\p s -> TokenWhile p) }
+  else		{ (\p s -> TokenElse p) }
 
 
   --Tile Functions:
@@ -53,16 +75,38 @@ tokens :-
 data Token =
 --  TokenTileLine AlexPosn String  |  
   TokenInt AlexPosn Int          | 
---  TokenDoNothing AlexPosn        |
+  TokenDoNothing AlexPosn        |
   
   
   --Code Syntax
   TokenEq AlexPosn               |
   TokenLParen AlexPosn           |
   TokenRParen AlexPosn           |
+  TokenLSquig AlexPosn           |
+  TokenRSquig AlexPosn           |
   TokenSemiColon AlexPosn        |
   TokenComma AlexPosn            |
 
+  --Boolean logic
+  TokenTrue AlexPosn             |
+  TokenFalse AlexPosn            |
+  TokenAnd AlexPosn              |
+  TokenOr AlexPosn               |
+  TokenNot AlexPosn              |
+  TokenLessThan AlexPosn         |
+  TokenMoreThan AlexPosn         |
+
+  --Integer logic
+  TokenPlus AlexPosn             |
+  TokenMinus AlexPosn		         |
+  TokenTimes AlexPosn		         |
+  TokenDiv AlexPosn		           |
+  TokenExponential AlexPosn	     |
+
+  --If/While
+  TokenIf AlexPosn               |
+  TokenWhile AlexPosn		         |
+  TokenElse AlexPosn             |
 
   --Tile Functions:
   TokenCTR AlexPosn              |
@@ -87,18 +131,40 @@ data Token =
   deriving (Eq,Show) 
 
 tokenPosn :: Token -> String
--- tokenPosn (TokenTileLine  (AlexPn a l c) _) = show(l) ++ ":" ++ show(c)
+--tokenPosn (TokenTileLine  (AlexPn a l c) _) = show(l) ++ ":" ++ show(c)
 tokenPosn (TokenInt  (AlexPn a l c) _) = show(l) ++ ":" ++ show(c)
---tokenPosn (TokenDoNothin  (AlexPn a l c) _) = show(l) ++ ":" ++ show(c)
+tokenPosn (TokenDoNothing  (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 
 
 --Code Syntax
 tokenPosn (TokenEq  (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 tokenPosn (TokenLParen (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 tokenPosn (TokenRParen (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
+tokenPosn (TokenLSquig (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
+tokenPosn (TokenRSquig (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 tokenPosn (TokenSemiColon (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 tokenPosn (TokenComma (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 
+--Boolean logic
+tokenPosn (TokenTrue  (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
+tokenPosn (TokenFalse  (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
+tokenPosn (TokenAnd  (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
+tokenPosn (TokenOr  (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
+tokenPosn (TokenNot  (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
+tokenPosn (TokenLessThan  (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
+tokenPosn (TokenMoreThan  (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
+
+--Integer Logic
+tokenPosn (TokenPlus  (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
+tokenPosn (TokenMinus  (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
+tokenPosn (TokenTimes  (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
+tokenPosn (TokenDiv  (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
+tokenPosn (TokenExponential  (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
+
+--If/While
+tokenPosn (TokenIf (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
+tokenPosn (TokenWhile (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
+tokenPosn (TokenElse (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 
 --Tile Functions
 tokenPosn (TokenCTR (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
@@ -115,7 +181,6 @@ tokenPosn (TokenRTX (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 tokenPosn (TokenRTY (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 tokenPosn (TokenRTXY (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 tokenPosn (TokenPrint (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
-
 
 --Variables
 tokenPosn (TokenTileVar (AlexPn a l c) _) = show(l) ++ ":" ++ show(c)

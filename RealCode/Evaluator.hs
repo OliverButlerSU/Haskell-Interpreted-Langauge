@@ -1,3 +1,13 @@
+--CURRENTLY INCORRECT NEED TO UPDATE!!!!!!!!
+--CURRENTLY INCORRECT NEED TO UPDATE!!!!!!!!
+--CURRENTLY INCORRECT NEED TO UPDATE!!!!!!!!
+--CURRENTLY INCORRECT NEED TO UPDATE!!!!!!!!
+--CURRENTLY INCORRECT NEED TO UPDATE!!!!!!!!
+--CURRENTLY INCORRECT NEED TO UPDATE!!!!!!!!
+
+
+
+
 module Evaluator where
 import Grammar
 
@@ -25,8 +35,6 @@ evaluateExp (ExpIf bool1 exp1 exp2) env | newBool1 = evaluateExp exp1 env
 --evaluateExp (ExpWhile boolexp exp1) env = evaluateExp (evaluateExp exp1 env) env
 
 --evaluateExp (ExpSetVarInt name value) env = ???
-
-
 
 
 
