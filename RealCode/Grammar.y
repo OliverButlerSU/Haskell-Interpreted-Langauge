@@ -57,6 +57,7 @@ import Tokens
     reflectTileXY { TokenRTXY _ }
     print { TokenPrint _ }
     getTileFile { TokenTileFile _ }
+    createSubTile { TokenSubTile _ }
 
     --Variable Name
     tileVar    { TokenTileVar _ $$ }
@@ -126,6 +127,7 @@ ExpTile : tileVar                                       { TileVar $1 }
         | reflectTileY '(' ExpTile ')'                  { TileRTY $3 }
         | reflectTileXY '(' ExpTile ')'                 { TileRTXY $3 }
         | '(' ExpTile ')'                               { $2 } 
+        | createSubTile '(' ExpTile ',' ExpInt ',' ExpInt ',' ExpInt ',' ExpInt ')' { TileSub $3 $5 $7 $9 $11 }
 
 { 
 parseError :: [Token] -> a
@@ -177,6 +179,7 @@ data ExpTile = TileVar String
              | TileRTX ExpTile
              | TileRTY ExpTile
              | TileRTXY ExpTile
+             | TileSub ExpTile ExpInt ExpInt ExpInt ExpInt
     deriving (Show,Eq)         
 
 } 

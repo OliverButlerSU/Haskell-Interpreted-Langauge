@@ -110,6 +110,14 @@ evaluateExpTile ((TileRTXY tile1),env) = do
                                                  newTile1 <- evaluateExpTile (tile1,env)
                                                  return $ reflectTileXY (newTile1)
 
+evaluateExpTile ((TileSub tile1 int1 int2 int3 int4),env) = do
+                                                newTile1 <- evaluateExpTile (tile1,env)
+                                                let newInt1 = evaluateExpInt (int1,env)
+                                                let newInt2 = evaluateExpInt (int2,env)
+                                                let newInt3 = evaluateExpInt (int3,env)
+                                                let newInt4 = evaluateExpInt (int4,env)
+                                                return $ createSubTile (newTile1) (newInt1) (newInt2) (newInt3) (newInt4)
+
 
 addTileVar :: String -> IO TileVar -> Environment -> Environment
 addTileVar name tile env | variableNameExists name env = replaceTileVar name tile env
@@ -313,13 +321,10 @@ negateTile (Tile x) = map negateRow x
 	where negateRow = map (\x -> if x == '0' then '1' else '0')
 
 
+--Used to create sub tiles from starting positions and lengths
+createSubTile (Tile xs) (xPos) (yPos) xsize ysize = Tile (splitList yPos ysize $ map (splitList xPos xsize) xs)
 
---Used to Pretty Print a tile (OLD MAYBE USE THO??)
---prettyPrint :: TileVar -> IO ()
---prettyPrint (Tile [x]) = putStrLn $ id x
---prettyPrint (Tile (x:xs)) = do
---			putStrLn $ id x
---			prettyPrint (Tile xs)
+splitList startPos length xs = take (length) (drop (startPos) xs)
 
 --Used to Pretty Print a tile
 prettyPrint :: TileVar -> IO ()	

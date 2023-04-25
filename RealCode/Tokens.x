@@ -43,7 +43,6 @@ tokens :-
   \*			{ (\p s -> TokenTimes p) }
   \/			{ (\p s -> TokenDiv p) }
   \^			{ (\p s -> TokenExponential p) }
-  \"      { (\p s -> TokenQuote p)}
 
   --If/While
   if			{ (\p s -> TokenIf p) }
@@ -67,6 +66,8 @@ tokens :-
   reflectTileXY { (\p s -> TokenRTXY p) }
   print { (\p s -> TokenPrint p) }
   getTileFile { (\p s -> TokenTileFile p) }
+  createSubTile { (\p s -> TokenSubTile p) }
+
 
   --Variable Name
   $alpha [$alpha $digit \_ \’]*   { (\p s -> TokenTileVar p s) } 
@@ -88,7 +89,6 @@ data Token =
   TokenRSquig AlexPosn           |
   TokenSemiColon AlexPosn        |
   TokenComma AlexPosn            |
-  TokenQuote AlexPosn            |
 
   --Boolean logic
   TokenTrue AlexPosn             |
@@ -127,7 +127,7 @@ data Token =
   TokenRTXY AlexPosn             |
   TokenPrint AlexPosn            | 
   TokenTileFile AlexPosn         |
-
+  TokenSubTile AlexPosn          |
 
   --Variables
   TokenTileVar AlexPosn String
@@ -148,7 +148,6 @@ tokenPosn (TokenLSquig (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 tokenPosn (TokenRSquig (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 tokenPosn (TokenSemiColon (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 tokenPosn (TokenComma (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
-tokenPosn (TokenQuote (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 
 --Boolean logic
 tokenPosn (TokenTrue  (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
@@ -187,6 +186,7 @@ tokenPosn (TokenRTY (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 tokenPosn (TokenRTXY (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 tokenPosn (TokenPrint (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 tokenPosn (TokenTileFile (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
+tokenPosn (TokenSubTile (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 
 --Variables
 tokenPosn (TokenTileVar (AlexPn a l c) _) = show(l) ++ ":" ++ show(c)
