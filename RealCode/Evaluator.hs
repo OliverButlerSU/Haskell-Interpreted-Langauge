@@ -80,7 +80,7 @@ evaluateExpTile ((TileRTXY tile1),env) = reflectTileXY (newTile1)
 
 
 addTileVar :: String -> TileVar -> Environment -> Environment
-addTileVar name tile env | variableNameExists name env = error "Error: variable already exists"
+addTileVar name tile env | variableNameExists name env = replaceTileVar name tile env
                          | otherwise = (name,tile):env
 
 
