@@ -56,6 +56,7 @@ import Tokens
     reflectTileY { TokenRTY _ }
     reflectTileXY { TokenRTXY _ }
     print { TokenPrint _ }
+    getTileFile { TokenTileFile _ }
 
     --Variable Name
     tileVar    { TokenTileVar _ $$ }
@@ -86,6 +87,7 @@ Exp : '(' Exp ')'                                                   { $2 }
     | tileVar '=' ExpTile       		                { ExpSetTileVar $1 $3 }
     | print ExpTile                                     { ExpPrint $2 }
     | doNothing                                         { ExpDoNothing }
+    | getTileFile tileVar tileVar                       { ExpGetTileFile $2 $3 }
 
 ExpInt : int                                            { IntVal $1}
        | '-' ExpInt %prec NEG      			            { IntNegate $2 } 
@@ -136,6 +138,7 @@ data Exp = ExpSetTileVar String ExpTile
          | ExpIf ExpBool Exp Exp
          | ExpWhile ExpBool Exp
          | ExpDoNothing
+         | ExpGetTileFile String String
     deriving (Show,Eq)
 
 data ExpBool = BoolTrue
