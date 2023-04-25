@@ -145,6 +145,16 @@ question3 (inp) = prettyPrint $ tile6
 	      tile6 = duplicateTileDown tile5 30
 
 --question4 (Tile ["11","00"]) (Tile ["00","11"]) (Tile ["01","10"])
+-- question4 :: TileExp -> TileExp -> TileExp -> [[Char]]
+question4 inp1 inp2 inp3 = prettyPrint final
+	where 
+		  initialList = [map (\y -> (x,y)) [0..49] | x <- [0..49]]
+		  toFillList = map (map (\x -> if snd x < 25 && fst x + snd x <50 then '1' else if snd x>=25 && fst x<=snd x then '2' else '#')) initialList
+		  tile1 = conjunctTiles inp1 (negateTile inp3)
+		  tile2 = conjunctTiles inp2 (negateTile inp3)
+		  lineToTiles = map (map (\x -> if x == '1' then tile1 else if x == '2' then tile2 else (createBlankTile (tile1)))) toFillList
+		  tilesToTextLine = map (foldr combineTilesRight (createBlankTile inp1)) lineToTiles 
+		  final = foldr combineTilesDown (Tile [""]) tilesToTextLine
 
 
 --question5 (Tile ["1100000011", "1100000011", "0011001111", "0011001111", "0000110011", "0000110011", "0011001111", "0011001111", "1111111111", "1111111111"])
@@ -155,4 +165,3 @@ question5 (inp) = prettyPrint $ tile4
 		tile3 = duplicateTileRight (createSubTile inp 4 4 6 6) 3
 		tile4 = combineTilesDown (combineTilesDown tile1 tile2) tile3
 -}
-
