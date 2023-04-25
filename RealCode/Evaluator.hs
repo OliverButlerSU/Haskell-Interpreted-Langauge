@@ -110,6 +110,23 @@ evaluateExpTile ((TileRTXY tile1),env) = do
                                                  newTile1 <- evaluateExpTile (tile1,env)
                                                  return $ reflectTileXY (newTile1)
 
+evaluateExpTile ((TileSub tile1 int1 int2 int3 int4),env) = do
+                                                newTile1 <- evaluateExpTile (tile1,env)
+                                                let newInt1 = evaluateExpInt (int1,env)
+                                                let newInt2 = evaluateExpInt (int2,env)
+                                                let newInt3 = evaluateExpInt (int3,env)
+                                                let newInt4 = evaluateExpInt (int4,env)
+                                                return $ createSubTile (newTile1) (newInt1) (newInt2) (newInt3) (newInt4)
+
+evaluateExpTile ((TileConjunct tile1 tile2),env) = do
+                                                 newTile1 <- evaluateExpTile (tile1,env)
+                                                 newTile2 <- evaluateExpTile (tile2,env)
+                                                 return $ conjunctTiles (newTile1) (newTile2)
+      
+
+evaluateExpTile ((TileNegate tile1),env) = do
+                                                 newTile1 <- evaluateExpTile (tile1,env)
+                                                 return $ negateTile (newTile1)
 
 addTileVar :: String -> IO TileVar -> Environment -> Environment
 addTileVar name tile env | variableNameExists name env = replaceTileVar name tile env
@@ -290,36 +307,41 @@ scaleTileSingular x amount = replicate amount $ (concat $ replicate amount [x])
 
 
 --Used to create a blank tile replica of the same size of the input tile
+createBlankTile :: TileVar -> TileVar
 createBlankTile (Tile [x]) = Tile [(concat $ replicate (length x) "0")]
 createBlankTile (Tile (x:xs)) = Tile (replicate (length (x:xs)) $ (concat $ replicate (length x) "0"))
 
 
 
 --Used to reflect a tile by x axis
+reflectTileX :: TileVar -> TileVar
 reflectTileX (Tile x) = Tile (reverse x)
 
 --Used to reflect a tile by y axis
+reflectTileY :: TileVar -> TileVar
 reflectTileY (Tile x) = Tile (map reverse x)
 
 --Used to reflect a tile by y=x
+reflectTileXY :: TileVar -> TileVar
 reflectTileXY (tile) = reflectTileY $ reflectTileX tile
 
 --Used to conjunct two tiles
-conjunctTiles (Tile x) (Tile y) = map zipTiles (zip x y)
+conjunctTiles :: TileVar -> TileVar -> TileVar
+conjunctTiles (Tile x) (Tile y) = Tile (map zipTiles (zip x y))
 	where zipTiles (x,y) = zipWith (\x y -> if all (=='1') [x,y] then '1' else '0') x y
 
 --Used to negate a tile
-negateTile (Tile x) = map negateRow x
+negateTile :: TileVar -> TileVar
+negateTile (Tile x) = Tile (map negateRow x)
 	where negateRow = map (\x -> if x == '0' then '1' else '0')
 
 
+--Used to create sub tiles from starting positions and lengths
+createSubTile :: TileVar -> Int -> Int -> Int -> Int -> TileVar
+createSubTile (Tile xs) (xPos) (yPos) xsize ysize = Tile (splitList yPos ysize $ map (splitList xPos xsize) xs)
 
---Used to Pretty Print a tile (OLD MAYBE USE THO??)
---prettyPrint :: TileVar -> IO ()
---prettyPrint (Tile [x]) = putStrLn $ id x
---prettyPrint (Tile (x:xs)) = do
---			putStrLn $ id x
---			prettyPrint (Tile xs)
+splitList :: Int -> Int -> [a] -> [a]
+splitList startPos length xs = take (length) (drop (startPos) xs)
 
 --Used to Pretty Print a tile
 prettyPrint :: TileVar -> IO ()	

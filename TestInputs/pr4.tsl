@@ -1,0 +1,8 @@
+getTileFile tile1 inp1;
+getTileFile tile2 inp2;
+getTileFile tile3 inp3;
+
+blankTile = createBlankTile(tile1);
+tile1 = tileConjunction(inp1, tileNegation(inp3))
+tile2 = tileConjunction(inp2, tileNegation(inp3))
+

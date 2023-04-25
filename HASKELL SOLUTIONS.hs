@@ -100,6 +100,11 @@ negateTile (Tile x) = Tile (map negateRow x)
 	where negateRow = map (\x -> if x == '0' then '1' else '0')
 
 
+createSubTile (Tile xs) (xPos) (yPos) xsize ysize = Tile (splitList yPos ysize $ map (splitList xPos xsize) xs)
+
+splitList startPos length xs = take (length) (drop (startPos) xs)
+
+
 --Used to Pretty Print a tile (OLD MAYBE USE THO??)
 --prettyPrint :: TileExp -> IO ()
 --prettyPrint (Tile [x]) = putStrLn $ id x
@@ -150,3 +155,13 @@ question4 inp1 inp2 inp3 = prettyPrint final
 		  lineToTiles = map (map (\x -> if x == '1' then tile1 else if x == '2' then tile2 else (createBlankTile (tile1)))) toFillList
 		  tilesToTextLine = map (foldr combineTilesRight (createBlankTile inp1)) lineToTiles 
 		  final = foldr combineTilesDown (Tile [""]) tilesToTextLine
+
+
+--question5 (Tile ["1100000011", "1100000011", "0011001111", "0011001111", "0000110011", "0000110011", "0011001111", "0011001111", "1111111111", "1111111111"])
+{-
+question5 (inp) = prettyPrint $ tile4
+	where tile1 = duplicateTileRight (createSubTile inp 0 0 6 6) 3
+		tile2 = duplicateTileRight (createSubTile inp 2 2 6 6) 3
+		tile3 = duplicateTileRight (createSubTile inp 4 4 6 6) 3
+		tile4 = combineTilesDown (combineTilesDown tile1 tile2) tile3
+-}
