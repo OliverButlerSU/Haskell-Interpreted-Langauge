@@ -92,11 +92,11 @@ reflectTileXY (tile) = reflectTileY $ reflectTileX tile
 
 
 --Used to conjunct two tiles
-conjunctTiles (Tile x) (Tile y) = map zipTiles (zip x y)
+conjunctTiles (Tile x) (Tile y) = Tile (map zipTiles (zip x y))
 	where zipTiles (x,y) = zipWith (\x y -> if all (=='1') [x,y] then '1' else '0') x y
 
 --Used to negate a tile
-negateTile (Tile x) = map negateRow x
+negateTile (Tile x) = Tile (map negateRow x)
 	where negateRow = map (\x -> if x == '0' then '1' else '0')
 
 
@@ -140,3 +140,13 @@ question3 (inp) = prettyPrint $ tile6
 	      tile6 = duplicateTileDown tile5 30
 
 --question4 (Tile ["11","00"]) (Tile ["00","11"]) (Tile ["01","10"])
+-- question4 :: TileExp -> TileExp -> TileExp -> [[Char]]
+question4 inp1 inp2 inp3 = prettyPrint final
+	where 
+		  initialList = [map (\y -> (x,y)) [0..49] | x <- [0..49]]
+		  toFillList = map (map (\x -> if snd x < 25 && fst x + snd x <50 then '1' else if snd x>=25 && fst x<=snd x then '2' else '#')) initialList
+		  tile1 = conjunctTiles inp1 (negateTile inp3)
+		  tile2 = conjunctTiles inp2 (negateTile inp3)
+		  lineToTiles = map (map (\x -> if x == '1' then tile1 else if x == '2' then tile2 else (createBlankTile (tile1)))) toFillList
+		  tilesToTextLine = map (foldr combineTilesRight (createBlankTile inp1)) lineToTiles 
+		  final = foldr combineTilesDown (Tile [""]) tilesToTextLine
