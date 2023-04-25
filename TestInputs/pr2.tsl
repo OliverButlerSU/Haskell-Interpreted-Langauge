@@ -1,0 +1,6 @@
+tile1 = squareRotateTile(inp1);
+tile2 = combineTilesRight(tile1,tile1);
+tile3 = combineTilesRight(tile2, (combineTilesDown(inp1,rotateTile270Degrees(inp1))));
+tile4 = combineTilesDown((tile3),(combineTilesRight((combineTilesDown(tile1,(combineTilesRight(inp1,(rotateTile90Degrees(inp1)))))),(scaleTile(inp1,3)))));
+tile5 = squareRotateTile(tile4);
+print tile5;
