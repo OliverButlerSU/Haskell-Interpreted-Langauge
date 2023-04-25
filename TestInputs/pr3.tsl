@@ -1,3 +1,5 @@
+getTileFile tile1 inp1; 
+
 tile1 = combineTilesRight((combineTilesRight(inp1,(reflectTileY(inp1)))), (createBlankTile(inp1)));
 tile2 = combineTilesRight((combineTilesRight((createBlankTile(inp1)),(reflectTileX(inp1)))), (reflectTileXY(inp1)));
 baseTile = combineTilesDown(tile1,tile2);

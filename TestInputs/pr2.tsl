@@ -1,3 +1,5 @@
+getTileFile tile1 inp1;
+
 tile1 = squareRotateTile(inp1);
 tile2 = combineTilesRight(tile1,tile1);
 tile3 = combineTilesRight(tile2, (combineTilesDown(inp1,rotateTile270Degrees(inp1))));

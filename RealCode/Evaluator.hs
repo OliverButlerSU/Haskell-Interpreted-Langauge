@@ -1,8 +1,10 @@
 module Evaluator where
 import Grammar
 import Data.List
+import System.IO
+import Control.Monad
 
-type Environment = [(String, TileVar)]
+type Environment = [(String, IO TileVar)]
 type State = ([Exp], Environment)
 
 
@@ -23,72 +25,102 @@ evaluateExp((exp@(ExpWhile bool1 exp1):xs),env) | newBool1 = evaluateExp ((exp1:
                                                   where newBool1 = evaluateExpBool (bool1,env)
                                                   --Evaluates bool to true or false for the while statement and appends
 
-evaluateExp(((ExpPrint tile1):xs),env) = do prettyPrint (evaluateExpTile (tile1,env)) 
+evaluateExp(((ExpPrint tile1):xs),env) = do newTile1 <- evaluateExpTile (tile1,env)
+                                            prettyPrint (newTile1) 
                                             evaluateExp (xs, env)
 
 evaluateExp(((ExpSetTileVar name tile1):xs),env) = evaluateExp (xs, addTileVar name newTile1 env)
                                        where newTile1 = (evaluateExpTile (tile1,env))
 
+evaluateExp(((ExpGetTileFile file name):xs),env) = evaluateExp (xs, getTileFile file name env)
 
 
-evaluateExpTile :: (ExpTile,Environment) -> TileVar
+getTileFile :: String -> String -> Environment -> Environment
+getTileFile filename varname env = (varname, (createTileFromFile filename)):env
+
+
+createTileFromFile :: String -> IO TileVar
+createTileFromFile filename = do    
+    let list = []
+    handle <- openFile (filename++".tl") ReadMode
+    contents <- hGetContents handle
+    let singlewords = words contents
+        list = singlewords
+    return (Tile list)
+
+
+evaluateExpTile :: (ExpTile,Environment) -> IO TileVar
 evaluateExpTile ((TileVar name),env) = getTileVar name env
 
-evaluateExpTile ((TileCTR tile1 tile2),env) = combineTilesRight (newTile1) (newTile2)
-                                             where newTile1 = evaluateExpTile (tile1,env)
-                                                   newTile2 = evaluateExpTile (tile2,env)
+evaluateExpTile ((TileCTR tile1 tile2),env) = do
+                                                 newTile1 <- evaluateExpTile (tile1,env)
+                                                 newTile2 <- evaluateExpTile (tile2,env)
+                                                 return $ combineTilesRight (newTile1) (newTile2)
 
-evaluateExpTile ((TileCTD tile1 tile2),env) = combineTilesDown (newTile1) (newTile2)
-                                             where newTile1 = evaluateExpTile (tile1,env)
-                                                   newTile2 = evaluateExpTile (tile2,env)
+evaluateExpTile ((TileCTD tile1 tile2),env) = do
+                                                 newTile1 <- evaluateExpTile (tile1,env)
+                                                 newTile2 <- evaluateExpTile (tile2,env)
+                                                 return $ combineTilesDown (newTile1) (newTile2)
+      
 
-evaluateExpTile ((TileDTR tile1 int1),env) = duplicateTileRight (newTile1) (newInt1)
-                                             where newTile1 = evaluateExpTile (tile1,env)
-                                                   newInt1 = evaluateExpInt (int1,env)
+evaluateExpTile ((TileDTR tile1 int1),env) = do
+                                                 newTile1 <- evaluateExpTile (tile1,env)
+                                                 let newInt1 = evaluateExpInt (int1,env)
+                                                 return $ duplicateTileRight(newTile1) (newInt1)
 
-evaluateExpTile ((TileDTD tile1 int1),env) = duplicateTileDown (newTile1) (newInt1)
-                                             where newTile1 = evaluateExpTile (tile1,env)
-                                                   newInt1 = evaluateExpInt (int1,env)
+evaluateExpTile ((TileDTD tile1 int1),env) = do
+                                                 newTile1 <- evaluateExpTile (tile1,env)
+                                                 let newInt1 = evaluateExpInt (int1,env)
+                                                 return $ duplicateTileDown (newTile1) (newInt1)
 
-evaluateExpTile ((TileRT90 tile1),env) = rotateTile90Degrees (newTile1)
-                                             where newTile1 = evaluateExpTile (tile1,env)
+evaluateExpTile ((TileRT90 tile1),env) =  do
+                                                 newTile1 <- evaluateExpTile (tile1,env)
+                                                 return $ rotateTile90Degrees (newTile1)
 
-evaluateExpTile ((TileRT180 tile1),env) = rotateTile180Degrees (newTile1)
-                                             where newTile1 = evaluateExpTile (tile1,env)
+evaluateExpTile ((TileRT180 tile1),env) = do
+                                                 newTile1 <- evaluateExpTile (tile1,env)
+                                                 return $ rotateTile180Degrees (newTile1)
 
-evaluateExpTile ((TileRT270 tile1),env) = rotateTile270Degrees (newTile1)
-                                             where newTile1 = evaluateExpTile (tile1,env)
+evaluateExpTile ((TileRT270 tile1),env) = do
+                                                 newTile1 <- evaluateExpTile (tile1,env)
+                                                 return $ rotateTile270Degrees (newTile1)
 
-evaluateExpTile ((TileSRT tile1),env) = squareRotateTile (newTile1)
-                                             where newTile1 = evaluateExpTile (tile1,env)
+evaluateExpTile ((TileSRT tile1),env) = do
+                                                 newTile1 <- evaluateExpTile (tile1,env)
+                                                 return $ squareRotateTile (newTile1)
 
-evaluateExpTile ((TileST tile1 int1),env) = scaleTile (newTile1) (newInt1)
-                                             where newTile1 = evaluateExpTile (tile1,env)
-                                                   newInt1 = evaluateExpInt (int1,env)
+evaluateExpTile ((TileST tile1 int1),env) = do
+                                                 newTile1 <- evaluateExpTile (tile1,env)
+                                                 let newInt1 = evaluateExpInt (int1,env)
+                                                 return $ scaleTile (newTile1) (newInt1)
 
-evaluateExpTile ((TileCBT tile1),env) = createBlankTile (newTile1)
-                                             where newTile1 = evaluateExpTile (tile1,env)
+evaluateExpTile ((TileCBT tile1),env) = do
+                                                 newTile1 <- evaluateExpTile (tile1,env)
+                                                 return $ createBlankTile (newTile1)
 
-evaluateExpTile ((TileRTX tile1),env) = reflectTileX (newTile1)
-                                             where newTile1 = evaluateExpTile (tile1,env)
+evaluateExpTile ((TileRTX tile1),env) = do
+                                                 newTile1 <- evaluateExpTile (tile1,env)
+                                                 return $ reflectTileY (newTile1)
 
-evaluateExpTile ((TileRTY tile1),env) = reflectTileY (newTile1)
-                                             where newTile1 = evaluateExpTile (tile1,env)
+evaluateExpTile ((TileRTY tile1),env) = do
+                                                 newTile1 <- evaluateExpTile (tile1,env)
+                                                 return $ reflectTileX (newTile1)
 
-evaluateExpTile ((TileRTXY tile1),env) = reflectTileXY (newTile1)
-                                             where newTile1 = evaluateExpTile (tile1,env)
+evaluateExpTile ((TileRTXY tile1),env) = do
+                                                 newTile1 <- evaluateExpTile (tile1,env)
+                                                 return $ reflectTileXY (newTile1)
 
 
-addTileVar :: String -> TileVar -> Environment -> Environment
+addTileVar :: String -> IO TileVar -> Environment -> Environment
 addTileVar name tile env | variableNameExists name env = replaceTileVar name tile env
                          | otherwise = (name,tile):env
 
 
-getTileVar :: String -> Environment -> TileVar
+getTileVar :: String -> Environment -> IO TileVar
 getTileVar name env | variableNameExists name env = getTileVariable name env
                     | otherwise = error "Error: Variable name does not exist"
 
-getTileVariable :: String -> Environment -> TileVar
+getTileVariable :: String -> Environment -> IO TileVar
 getTileVariable name ((var,tile):xs) | name == var = tile
                                      | otherwise = getTileVariable name xs
 
@@ -97,7 +129,7 @@ variableNameExists name [] = False
 variableNameExists name ((var,tile):xs) | name == var = True
                                         | otherwise = variableNameExists name xs
 
-replaceTileVar :: String -> TileVar -> Environment -> Environment
+replaceTileVar :: String -> IO TileVar -> Environment -> Environment
 replaceTileVar name tile ((var,tilevar):xs) | name == var = (name,tile):xs
                                             | otherwise = (var,tilevar) : replaceTileVar name tile xs
 
