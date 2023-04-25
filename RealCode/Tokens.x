@@ -128,6 +128,8 @@ data Token =
   TokenPrint AlexPosn            | 
   TokenTileFile AlexPosn         |
   TokenSubTile AlexPosn          |
+  TokenConjunct AlexPosn         |
+  TokenNegate AlexPosn           |
 
   --Variables
   TokenTileVar AlexPosn String

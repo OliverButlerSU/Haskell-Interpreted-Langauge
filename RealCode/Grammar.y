@@ -58,6 +58,8 @@ import Tokens
     print { TokenPrint _ }
     getTileFile { TokenTileFile _ }
     createSubTile { TokenSubTile _ }
+    conjunctTiles { TokenConjunct _ }
+    negateTile { TokenNegate _}
 
     --Variable Name
     tileVar    { TokenTileVar _ $$ }
@@ -128,7 +130,8 @@ ExpTile : tileVar                                       { TileVar $1 }
         | reflectTileXY '(' ExpTile ')'                 { TileRTXY $3 }
         | '(' ExpTile ')'                               { $2 } 
         | createSubTile '(' ExpTile ',' ExpInt ',' ExpInt ',' ExpInt ',' ExpInt ')' { TileSub $3 $5 $7 $9 $11 }
-
+        | conjunctTiles '(' ExpTile ',' ExpTile ')'      { TileConjunct $3 $5 }
+        | negateTile '(' ExpTile ')'                    { TileNegate $3 }
 { 
 parseError :: [Token] -> a
 parseError [] = error "Unknown Parse Error" 
@@ -180,6 +183,8 @@ data ExpTile = TileVar String
              | TileRTY ExpTile
              | TileRTXY ExpTile
              | TileSub ExpTile ExpInt ExpInt ExpInt ExpInt
+             | TileConjunct ExpTile ExpTile
+             | TileNegate ExpTile
     deriving (Show,Eq)         
 
 } 
