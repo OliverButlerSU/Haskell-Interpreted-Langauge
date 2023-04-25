@@ -304,7 +304,13 @@ reflectTileY (Tile x) = Tile (map reverse x)
 --Used to reflect a tile by y=x
 reflectTileXY (tile) = reflectTileY $ reflectTileX tile
 
+--Used to conjunct two tiles
+conjunctTiles (Tile x) (Tile y) = map zipTiles (zip x y)
+	where zipTiles (x,y) = zipWith (\x y -> if all (=='1') [x,y] then '1' else '0') x y
 
+--Used to negate a tile
+negateTile (Tile x) = map negateRow x
+	where negateRow = map (\x -> if x == '0' then '1' else '0')
 
 
 
