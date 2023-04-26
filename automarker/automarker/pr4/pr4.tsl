@@ -1,9 +1,11 @@
 getTileFile tile1 inp1;
+blankTile = createBlankTile(inp1);
 getTileFile tile2 inp2;
+blankTile = createBlankTile(inp2);
 getTileFile tile3 inp3;
+blankTile = createBlankTile(inp3);
 
 --Create a blank tile of length 50
-blankTile = createBlankTile(inp1);
 conjunct1Neg3 = conjuctTiles(inp1, negateTile(inp3));
 conjunct2Neg3 = conjuctTiles(inp2, negateTile(inp3));
 
