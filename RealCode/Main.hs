@@ -15,7 +15,7 @@ main' = do (fileName : _ ) <- getArgs
            --putStrLn ("Lexed as \n" ++ (show lexedProg) ++ "\n")
            let parsedProg = (parseCalc lexedProg)
            --putStrLn ("Parsed as \n : " ++ (show parsedProg) ++ "\n")
-           let evalProg = evaluateExp ([parsedProg],[])
+           let evalProg = evaluateExp ([parsedProg],([],[]))
            evalProg
 
 noParse :: ErrorCall -> IO ()

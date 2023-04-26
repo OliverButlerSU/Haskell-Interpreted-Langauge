@@ -59,7 +59,8 @@ import Tokens
     getTileFile { TokenTileFile _ }
     createSubTile { TokenSubTile _ }
     conjunctTiles { TokenConjunct _ }
-    negateTile { TokenNegate _}
+    negateTile { TokenNegate _ }
+    removeTop { TokenRemoveTop _ }
 
     --Variable Name
     tileVar    { TokenTileVar _ $$ }
@@ -88,11 +89,13 @@ Exp : '(' Exp ')'                                                   { $2 }
     | if '(' ExpBool ')' '{' MultiExp '}' else '{' MultiExp '}'     { ExpIf $3 $6 $10 } 
     | while '(' ExpBool ')' '{' MultiExp '}'		                { ExpWhile $3 $6 }
     | tileVar '=' ExpTile       		                { ExpSetTileVar $1 $3 }
+    | tileVar '=' ExpInt                                { ExpSetIntVar $1 $3 }
     | print ExpTile                                     { ExpPrint $2 }
     | doNothing                                         { ExpDoNothing }
     | getTileFile tileVar tileVar                       { ExpGetTileFile $2 $3 }
 
-ExpInt : int                                            { IntVal $1}
+ExpInt : int                                            { IntVal $1 }
+       | tileVar                                        { IntVar $1 }
        | '-' ExpInt %prec NEG      			            { IntNegate $2 } 
        | ExpInt '+' ExpInt            			        { IntPlus $1 $3 } 
        | ExpInt '-' ExpInt            		            { IntMinus $1 $3 } 
@@ -132,6 +135,7 @@ ExpTile : tileVar                                       { TileVar $1 }
         | createSubTile '(' ExpTile ',' ExpInt ',' ExpInt ',' ExpInt ',' ExpInt ')' { TileSub $3 $5 $7 $9 $11 }
         | conjunctTiles '(' ExpTile ',' ExpTile ')'      { TileConjunct $3 $5 }
         | negateTile '(' ExpTile ')'                    { TileNegate $3 }
+        | removeTop '(' ExpTile ',' ExpInt ')'          { TileRemoveTop $3 $5 }
 { 
 parseError :: [Token] -> a
 parseError [] = error "Unknown Parse Error" 
@@ -144,6 +148,7 @@ data Exp = ExpSetTileVar String ExpTile
          | ExpWhile ExpBool Exp
          | ExpDoNothing
          | ExpGetTileFile String String
+         | ExpSetIntVar String ExpInt
     deriving (Show,Eq)
 
 data ExpBool = BoolTrue
@@ -160,6 +165,7 @@ data ExpBool = BoolTrue
     deriving (Show,Eq)
 
 data ExpInt = IntVal Int
+            | IntVar String
             | IntNegate ExpInt
             | IntPlus ExpInt ExpInt
             | IntMinus ExpInt ExpInt
@@ -185,6 +191,7 @@ data ExpTile = TileVar String
              | TileSub ExpTile ExpInt ExpInt ExpInt ExpInt
              | TileConjunct ExpTile ExpTile
              | TileNegate ExpTile
+             | TileRemoveTop ExpTile ExpInt
     deriving (Show,Eq)         
 
 } 

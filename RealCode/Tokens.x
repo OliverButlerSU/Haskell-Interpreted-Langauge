@@ -67,6 +67,9 @@ tokens :-
   print { (\p s -> TokenPrint p) }
   getTileFile { (\p s -> TokenTileFile p) }
   createSubTile { (\p s -> TokenSubTile p) }
+  negateTile { (\p s -> TokenNegate p) }
+  conjuctTiles { (\p s -> TokenConjunct p) }
+  removeTop { (\p s -> TokenRemoveTop p) }
 
 
   --Variable Name
@@ -130,6 +133,7 @@ data Token =
   TokenSubTile AlexPosn          |
   TokenConjunct AlexPosn         |
   TokenNegate AlexPosn           |
+  TokenRemoveTop AlexPosn        |
 
   --Variables
   TokenTileVar AlexPosn String
@@ -189,6 +193,7 @@ tokenPosn (TokenRTXY (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 tokenPosn (TokenPrint (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 tokenPosn (TokenTileFile (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 tokenPosn (TokenSubTile (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
+tokenPosn (TokenRemoveTop (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 
 --Variables
 tokenPosn (TokenTileVar (AlexPn a l c) _) = show(l) ++ ":" ++ show(c)

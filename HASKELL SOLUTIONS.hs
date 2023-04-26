@@ -104,6 +104,8 @@ createSubTile (Tile xs) (xPos) (yPos) xsize ysize = Tile (splitList yPos ysize $
 
 splitList startPos length xs = take (length) (drop (startPos) xs)
 
+removeLastTileLine (Tile xs) = Tile (take (length xs-1)xs)
+
 
 --Used to Pretty Print a tile (OLD MAYBE USE THO??)
 --prettyPrint :: TileExp -> IO ()
@@ -146,7 +148,7 @@ question3 (inp) = prettyPrint $ tile6
 
 --question4 (Tile ["11","00"]) (Tile ["00","11"]) (Tile ["01","10"])
 -- question4 :: TileExp -> TileExp -> TileExp -> [[Char]]
-question4 inp1 inp2 inp3 = prettyPrint final
+question4 inp1 inp2 inp3 = prettyPrint $ newFinal
 	where 
 		  initialList = [map (\y -> (x,y)) [0..49] | x <- [0..49]]
 		  toFillList = map (map (\x -> if snd x < 25 && fst x + snd x <50 then '1' else if snd x>=25 && fst x<=snd x then '2' else '#')) initialList
@@ -155,6 +157,7 @@ question4 inp1 inp2 inp3 = prettyPrint final
 		  lineToTiles = map (map (\x -> if x == '1' then tile1 else if x == '2' then tile2 else (createBlankTile (tile1)))) toFillList
 		  tilesToTextLine = map (foldr combineTilesRight (createBlankTile inp1)) lineToTiles 
 		  final = foldr combineTilesDown (Tile [""]) tilesToTextLine
+		  newFinal = removeLastTileLine final
 
 
 --question5 (Tile ["1100000011", "1100000011", "0011001111", "0011001111", "0000110011", "0000110011", "0011001111", "0011001111", "1111111111", "1111111111"])

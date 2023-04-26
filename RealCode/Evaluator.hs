@@ -4,11 +4,12 @@ import Data.List
 import System.IO
 import Control.Monad
 
-type Environment = [(String, IO TileVar)]
+type Environment = ([(String, IO TileVar)],[(String, Int)])
 type State = ([Exp], Environment)
 
 
 data TileVar = Tile [String]
+      deriving (Show,Eq)
 
 evaluateExp :: State -> IO ()
 evaluateExp state@(([]),env) = return ()
@@ -16,7 +17,7 @@ evaluateExp state@((ExpDoNothing:xs) ,env) = evaluateExp (xs,env)
 evaluateExp state@(((MultiExpr exp1 exp2):xs),env) = evaluateExp ((exp1:exp2:xs),env)
 
 evaluateExp(((ExpIf bool1 exp1 exp2):xs),env) | newBool1 = evaluateExp ((exp1:xs),env)
-                                              | otherwise = evaluateExp ((exp1:xs),env)
+                                              | otherwise = evaluateExp ((exp2:xs),env)
                                               where newBool1 = evaluateExpBool (bool1,env)
                                               --Evaluates bool to true or false for the if statement and evaluates one of the expressions
 
@@ -32,11 +33,14 @@ evaluateExp(((ExpPrint tile1):xs),env) = do newTile1 <- evaluateExpTile (tile1,e
 evaluateExp(((ExpSetTileVar name tile1):xs),env) = evaluateExp (xs, addTileVar name newTile1 env)
                                        where newTile1 = (evaluateExpTile (tile1,env))
 
+evaluateExp(((ExpSetIntVar name int1):xs),env) = evaluateExp(xs, addIntVar name newInt1 env)
+                                       where newInt1 = (evaluateExpInt (int1,env))
+
 evaluateExp(((ExpGetTileFile file name):xs),env) = evaluateExp (xs, getTileFile file name env)
 
 
 getTileFile :: String -> String -> Environment -> Environment
-getTileFile filename varname env = (varname, (createTileFromFile filename)):env
+getTileFile filename varname (tiles,ints) = (((varname, (createTileFromFile filename)):tiles),ints)
 
 
 createTileFromFile :: String -> IO TileVar
@@ -100,11 +104,11 @@ evaluateExpTile ((TileCBT tile1),env) = do
 
 evaluateExpTile ((TileRTX tile1),env) = do
                                                  newTile1 <- evaluateExpTile (tile1,env)
-                                                 return $ reflectTileY (newTile1)
+                                                 return $ reflectTileX (newTile1)
 
 evaluateExpTile ((TileRTY tile1),env) = do
                                                  newTile1 <- evaluateExpTile (tile1,env)
-                                                 return $ reflectTileX (newTile1)
+                                                 return $ reflectTileY (newTile1)
 
 evaluateExpTile ((TileRTXY tile1),env) = do
                                                  newTile1 <- evaluateExpTile (tile1,env)
@@ -128,33 +132,57 @@ evaluateExpTile ((TileNegate tile1),env) = do
                                                  newTile1 <- evaluateExpTile (tile1,env)
                                                  return $ negateTile (newTile1)
 
+evaluateExpTile ((TileRemoveTop tile1 int1), env) = do
+                                                 newTile1 <- evaluateExpTile (tile1,env)
+                                                 let newInt1 = evaluateExpInt (int1,env)
+                                                 return $ removeTop (newTile1) (newInt1)
+
 addTileVar :: String -> IO TileVar -> Environment -> Environment
-addTileVar name tile env | variableNameExists name env = replaceTileVar name tile env
-                         | otherwise = (name,tile):env
+addTileVar name tile (tiles,ints) | variableNameExists name tiles = ((replaceTileVar name tile tiles),ints)
+                                  | otherwise = ((name,tile):tiles,ints)
 
 
+
+--Functions for adding/getting tile variables
 getTileVar :: String -> Environment -> IO TileVar
-getTileVar name env | variableNameExists name env = getTileVariable name env
-                    | otherwise = error "Error: Variable name does not exist"
+getTileVar name (tiles,ints) | variableNameExists name tiles = getTileVariable name tiles
+                             | otherwise = error ("Error: Variable name " ++ name ++ " does not exist " ++ show(length tiles))
 
-getTileVariable :: String -> Environment -> IO TileVar
+
+getTileVariable :: String -> [(String, IO TileVar)] -> IO TileVar
 getTileVariable name ((var,tile):xs) | name == var = tile
                                      | otherwise = getTileVariable name xs
 
-variableNameExists :: String -> Environment -> Bool
+variableNameExists :: String -> [(String, a)] -> Bool
 variableNameExists name [] = False
 variableNameExists name ((var,tile):xs) | name == var = True
                                         | otherwise = variableNameExists name xs
 
-replaceTileVar :: String -> IO TileVar -> Environment -> Environment
+replaceTileVar :: String -> IO TileVar -> [(String, IO TileVar)] -> [(String, IO TileVar)]
 replaceTileVar name tile ((var,tilevar):xs) | name == var = (name,tile):xs
                                             | otherwise = (var,tilevar) : replaceTileVar name tile xs
 
 
+--Functions for adding/getting int variables
+addIntVar :: String -> Int -> Environment -> Environment
+addIntVar name int (tiles,ints) | variableNameExists name ints = (tiles,(replaceIntVar name int ints))
+                                | otherwise = (tiles,(name,int):ints)
 
+getIntVar :: String -> Environment -> Int
+getIntVar name (tiles,ints) | variableNameExists name ints = getIntVariable name ints
+                            | otherwise = error ("Error: Variable name" ++ name ++ "does not exist")
+
+getIntVariable :: String -> [(String, Int)] -> Int
+getIntVariable name ((var,int):xs) | name == var = int
+                                   | otherwise = getIntVariable name xs
+
+replaceIntVar :: String -> Int -> [(String, Int)] -> [(String, Int)]
+replaceIntVar name int ((var,intvar):xs) | name == var = (name,int):xs
+                                         | otherwise = (var,intvar) : replaceIntVar name int xs
 
 evaluateExpInt :: (ExpInt,Environment) -> Int
 evaluateExpInt ((IntVal int1),env) = int1
+evaluateExpInt ((IntVar name),env) = getIntVar name env
 evaluateExpInt ((IntNegate int1),env) = - evaluateExpInt (int1,env)
 
 evaluateExpInt ((IntPlus int1 int2),env) = (newInt1) + (newInt2)
@@ -342,6 +370,10 @@ createSubTile (Tile xs) (xPos) (yPos) xsize ysize = Tile (splitList yPos ysize $
 
 splitList :: Int -> Int -> [a] -> [a]
 splitList startPos length xs = take (length) (drop (startPos) xs)
+
+
+removeTop :: TileVar -> Int -> TileVar
+removeTop (Tile xs) val = Tile (drop val xs)
 
 --Used to Pretty Print a tile
 prettyPrint :: TileVar -> IO ()	
