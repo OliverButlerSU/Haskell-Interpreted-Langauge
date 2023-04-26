@@ -49,12 +49,8 @@ getTileFile filename varname (tiles,ints) = (((varname, (createTileFromFile file
 
 createTileFromFile :: String -> IO TileVar
 createTileFromFile filename = do    
-    let list = []
-    handle <- openFile (filename++".tl") ReadMode
-    contents <- hGetContents handle
-    let singlewords = words contents
-        list = singlewords
-    return (Tile list)
+    contents <- readFile (filename++".tl")
+    return (Tile (words contents))
 
 
 evaluateExpTile :: (ExpTile,Environment) -> IO TileVar

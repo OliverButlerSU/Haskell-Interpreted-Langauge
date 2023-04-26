@@ -141,8 +141,8 @@ question3 (inp) = prettyPrint $ tile6
 	where tile1 = combineTilesRight (combineTilesRight inp (reflectTileY inp)) (createBlankTile inp)
 	      tile2 = combineTilesRight (combineTilesRight (createBlankTile inp) (reflectTileX inp)) (reflectTileXY inp)
 	      baseTile = combineTilesDown tile1 tile2
-	      tile3 = combineTilesRight (baseTile) (reflectTileY baseTile)
-	      tile4 = combineTilesDown (tile3) (reflectTileX tile3)
+	      tile3 = combineTilesRight (baseTile) (reflectTileX baseTile)
+	      tile4 = combineTilesDown (tile3) (tile3)
 	      tile5 = duplicateTileRight tile4 10
 	      tile6 = duplicateTileDown tile5 30
 
