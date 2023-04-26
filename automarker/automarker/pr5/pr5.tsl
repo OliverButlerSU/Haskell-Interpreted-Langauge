@@ -1,0 +1,8 @@
+getTileFile tile1 inp1;
+
+tile1 = duplicateTileRight( createSubTile(inp1,0,0,6,6), 3);
+tile2 = duplicateTileRight( createSubTile(inp1,2,2,6,6), 3);
+tile3 = duplicateTileRight( createSubTile(inp1,4,4,6,6), 3);
+
+tile4 = combineTilesDown(combineTilesDown(tile1,tile2),tile3);
+print tile4;
