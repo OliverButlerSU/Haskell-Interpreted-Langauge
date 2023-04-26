@@ -13,6 +13,10 @@ data TileVar = Tile [String]
 
 evaluateExp :: State -> IO ()
 evaluateExp state@(([]),env) = return ()
+evaluateExp state@((ExpReturn tile1):xs, env) = do 
+                                                      newTile1 <- evaluateExpTile (tile1,env)
+                                                      prettyPrint (newTile1)
+
 evaluateExp state@((ExpDoNothing:xs) ,env) = evaluateExp (xs,env)
 evaluateExp state@(((MultiExpr exp1 exp2):xs),env) = evaluateExp ((exp1:exp2:xs),env)
 

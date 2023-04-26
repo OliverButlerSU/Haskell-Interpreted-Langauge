@@ -70,7 +70,7 @@ tokens :-
   negateTile { (\p s -> TokenNegate p) }
   conjuctTiles { (\p s -> TokenConjunct p) }
   removeTop { (\p s -> TokenRemoveTop p) }
-
+  return { (\p s -> TokenReturnTile p) }
 
   --Variable Name
   $alpha [$alpha $digit \_ \’]*   { (\p s -> TokenTileVar p s) } 
@@ -134,6 +134,7 @@ data Token =
   TokenConjunct AlexPosn         |
   TokenNegate AlexPosn           |
   TokenRemoveTop AlexPosn        |
+  TokenReturnTile AlexPosn       |
 
   --Variables
   TokenTileVar AlexPosn String
@@ -194,6 +195,7 @@ tokenPosn (TokenPrint (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 tokenPosn (TokenTileFile (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 tokenPosn (TokenSubTile (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 tokenPosn (TokenRemoveTop (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
+tokenPosn (TokenReturnTile (AlexPn a l c)) = show(l) ++ ":" ++ show(c)
 
 --Variables
 tokenPosn (TokenTileVar (AlexPn a l c) _) = show(l) ++ ":" ++ show(c)

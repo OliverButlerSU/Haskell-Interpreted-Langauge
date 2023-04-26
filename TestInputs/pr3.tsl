@@ -8,4 +8,4 @@ tile4 = combineTilesDown(tile3, (reflectTileX(tile3)));
 tile5 = duplicateTileRight(tile4, 10);
 tile6 = duplicateTileDown(tile5, 30);
 
-print tile6;
+return tile6;

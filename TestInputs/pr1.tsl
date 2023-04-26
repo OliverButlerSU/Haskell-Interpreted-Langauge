@@ -5,4 +5,5 @@ tile1 = combineTilesRight(inp1,inp2);
 tile2 = duplicateTileRight(tile1,32);
 tile3 = combineTilesDown(tile2, rotateTile180Degrees(tile2));
 tile4 = duplicateTileDown(tile3,32);
-print tile4;
+
+return tile4;

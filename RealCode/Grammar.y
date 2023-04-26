@@ -61,6 +61,7 @@ import Tokens
     conjunctTiles { TokenConjunct _ }
     negateTile { TokenNegate _ }
     removeTop { TokenRemoveTop _ }
+    return { TokenReturnTile _ }
 
     --Variable Name
     tileVar    { TokenTileVar _ $$ }
@@ -93,6 +94,7 @@ Exp : '(' Exp ')'                                                   { $2 }
     | print ExpTile                                     { ExpPrint $2 }
     | doNothing                                         { ExpDoNothing }
     | getTileFile tileVar tileVar                       { ExpGetTileFile $2 $3 }
+    | return ExpTile                                    { ExpReturn $2 }
 
 ExpInt : int                                            { IntVal $1 }
        | tileVar                                        { IntVar $1 }
@@ -149,6 +151,7 @@ data Exp = ExpSetTileVar String ExpTile
          | ExpDoNothing
          | ExpGetTileFile String String
          | ExpSetIntVar String ExpInt
+         | ExpReturn ExpTile
     deriving (Show,Eq)
 
 data ExpBool = BoolTrue

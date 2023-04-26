@@ -45,4 +45,5 @@ while (row < 50){
 };
 
 finalTile = removeTop(rowTile, 2);
-print finalTile;
+
+return finalTile;
