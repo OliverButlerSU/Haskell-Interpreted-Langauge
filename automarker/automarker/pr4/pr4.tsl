@@ -1,13 +1,11 @@
 getTileFile tile1 inp1;
-blankTile = createBlankTile(inp1);
 getTileFile tile2 inp2;
-blankTile = createBlankTile(inp2);
 getTileFile tile3 inp3;
-blankTile = createBlankTile(inp3);
 
 --Create a blank tile of length 50
-conjunct1Neg3 = conjuctTiles(inp1, negateTile(inp3));
-conjunct2Neg3 = conjuctTiles(inp2, negateTile(inp3));
+blankTile = createBlankTile(inp1);
+conjunct1Neg3 = conjunctTiles(inp1, negateTile(inp3));
+conjunct2Neg3 = conjunctTiles(inp2, negateTile(inp3));
 
 row = 0;
 column = 0;
@@ -18,10 +16,10 @@ columnTile = createBlankTile(inp1);
 while (row < 50){
 
 	if(((row + column) < 50) && (column < 25)){
-		columnTile = conjuctTiles(inp1, negateTile(inp3));
+		columnTile = conjunctTiles(inp1, negateTile(inp3));
 	} else{
 		if((row <= column) && (column >= 25)){
-			columnTile = conjuctTiles(inp2, negateTile(inp3));
+			columnTile = conjunctTiles(inp2, negateTile(inp3));
 		} else{
 			columnTile = createBlankTile(inp1);
 		};
@@ -30,10 +28,10 @@ while (row < 50){
 
 	while(column < 50){
 		if((row + column < 50) && (column < 25)){
-			columnTile = combineTilesRight(columnTile, conjuctTiles(inp1, negateTile(inp3)));
+			columnTile = combineTilesRight(columnTile, conjunctTiles(inp1, negateTile(inp3)));
 		} else{
 			if((row <= column) && (column >= 25)){
-				columnTile = combineTilesRight(columnTile, conjuctTiles(inp2, negateTile(inp3)));
+				columnTile = combineTilesRight(columnTile, conjunctTiles(inp2, negateTile(inp3)));
 			} else{
 				columnTile = combineTilesRight(columnTile, blankTile);
 			};

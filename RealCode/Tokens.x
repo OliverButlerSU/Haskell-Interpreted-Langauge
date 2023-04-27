@@ -68,7 +68,7 @@ tokens :-
   getTileFile { (\p s -> TokenTileFile p) }
   createSubTile { (\p s -> TokenSubTile p) }
   negateTile { (\p s -> TokenNegate p) }
-  conjuctTiles { (\p s -> TokenConjunct p) }
+  conjunctTiles { (\p s -> TokenConjunct p) }
   removeTop { (\p s -> TokenRemoveTop p) }
   return { (\p s -> TokenReturnTile p) }
 

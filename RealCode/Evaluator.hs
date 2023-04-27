@@ -3,11 +3,15 @@ import Grammar
 import Data.List
 import System.IO
 import Control.Monad
+import Control.DeepSeq
 
+--List of all variables for tiles and integers
 type Environment = ([(String, IO TileVar)],[(String, Int)])
+
+--A list of expressions to evaluate, in order of what to evaluate, paired with a list of all variables
 type State = ([Exp], Environment)
 
-
+--Tile variable type being a list of Strings, each row being a new value in the array
 data TileVar = Tile [String]
       deriving (Show,Eq)
 
@@ -43,14 +47,17 @@ evaluateExp(((ExpSetIntVar name int1):xs),env) = evaluateExp(xs, addIntVar name 
 evaluateExp(((ExpGetTileFile file name):xs),env) = evaluateExp (xs, getTileFile file name env)
 
 
+--Creates a tile from a file
 getTileFile :: String -> String -> Environment -> Environment
 getTileFile filename varname (tiles,ints) = (((varname, (createTileFromFile filename)):tiles),ints)
 
 
 createTileFromFile :: String -> IO TileVar
 createTileFromFile filename = do    
-    contents <- readFile (filename++".tl")
-    return (Tile (words contents))
+    contents <- openFile (filename++".tl") ReadMode
+    list <- hGetContents contents
+    list `deepseq` hClose contents
+    return (Tile (words list))
 
 
 evaluateExpTile :: (ExpTile,Environment) -> IO TileVar
@@ -146,7 +153,7 @@ addTileVar name tile (tiles,ints) | variableNameExists name tiles = ((replaceTil
 --Functions for adding/getting tile variables
 getTileVar :: String -> Environment -> IO TileVar
 getTileVar name (tiles,ints) | variableNameExists name tiles = getTileVariable name tiles
-                             | otherwise = error ("Error: Variable name " ++ name ++ " does not exist " ++ show(length tiles))
+                             | otherwise = error ("Error: Variable name for tiles: " ++ name ++ " does not exist")
 
 
 getTileVariable :: String -> [(String, IO TileVar)] -> IO TileVar
@@ -170,7 +177,7 @@ addIntVar name int (tiles,ints) | variableNameExists name ints = (tiles,(replace
 
 getIntVar :: String -> Environment -> Int
 getIntVar name (tiles,ints) | variableNameExists name ints = getIntVariable name ints
-                            | otherwise = error ("Error: Variable name" ++ name ++ "does not exist")
+                            | otherwise = error ("Error: Variable name for integers: " ++ name ++ " does not exist")
 
 getIntVariable :: String -> [(String, Int)] -> Int
 getIntVariable name ((var,int):xs) | name == var = int
@@ -180,6 +187,10 @@ replaceIntVar :: String -> Int -> [(String, Int)] -> [(String, Int)]
 replaceIntVar name int ((var,intvar):xs) | name == var = (name,int):xs
                                          | otherwise = (var,intvar) : replaceIntVar name int xs
 
+
+
+
+--Evaluates an integer expression to an integer
 evaluateExpInt :: (ExpInt,Environment) -> Int
 evaluateExpInt ((IntVal int1),env) = int1
 evaluateExpInt ((IntVar name),env) = getIntVar name env
@@ -209,7 +220,7 @@ evaluateExpInt ((IntExponential int1 int2),env) = (newInt1) ^ (newInt2)
 
 
 
-
+--Evaluates a boolean expressions to a boolean
 evaluateExpBool :: (ExpBool,Environment) ->  Bool
 evaluateExpBool (BoolTrue,env) = True
 evaluateExpBool (BoolFalse,env) = False
@@ -249,11 +260,12 @@ evaluateExpBool ((BoolNotEqual exp1 exp2),env) = (newInt1) /= (newInt2)
                                             where newInt1 = evaluateExpInt (exp1,env)
                                                   newInt2 = evaluateExpInt (exp2,env)
 
-
+--Converts from Bool to ExpBool
 convBoolToExpBool :: Bool -> ExpBool
 convBoolToExpBool True = BoolTrue
 convBoolToExpBool False = BoolFalse
 
+--Converts from Int to ExpInt
 convIntToExpInt :: Int -> ExpInt
 convIntToExpInt val = IntVal val
 
@@ -371,7 +383,7 @@ createSubTile (Tile xs) (xPos) (yPos) xsize ysize = Tile (splitList yPos ysize $
 splitList :: Int -> Int -> [a] -> [a]
 splitList startPos length xs = take (length) (drop (startPos) xs)
 
-
+--Used to remove a top row of tiles
 removeTop :: TileVar -> Int -> TileVar
 removeTop (Tile xs) val = Tile (drop val xs)
 
