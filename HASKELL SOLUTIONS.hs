@@ -148,6 +148,7 @@ question3 (inp) = prettyPrint $ tile6
 
 --question4 (Tile ["11","00"]) (Tile ["00","11"]) (Tile ["01","10"])
 -- question4 :: TileExp -> TileExp -> TileExp -> [[Char]]
+{-
 question4 inp1 inp2 inp3 = prettyPrint $ newFinal
 	where 
 		  initialList = [map (\y -> (x,y)) [0..49] | x <- [0..49]]
@@ -158,7 +159,7 @@ question4 inp1 inp2 inp3 = prettyPrint $ newFinal
 		  tilesToTextLine = map (foldr combineTilesRight (createBlankTile inp1)) lineToTiles 
 		  final = foldr combineTilesDown (Tile [""]) tilesToTextLine
 		  newFinal = removeLastTileLine final
-
+-}
 
 --question5 (Tile ["1100000011", "1100000011", "0011001111", "0011001111", "0000110011", "0000110011", "0011001111", "0011001111", "1111111111", "1111111111"])
 {-
@@ -189,5 +190,10 @@ question9 inp1 = prettyPrint $ inp1
 
 
 --question10 (Tile ["00000000000000000000", "00000011111111000000", "00000111111111100000", "00001111111111110000", "00011111111111111000", "00111001111110011100", "00111001111110011100", "00111111111111111100", "01111111111111111110", "01111111111111111110", "01111111111111111110", "01111111111111111110", "00111111111111111100", "00111001111111001100", "00111100000000011100", "00011111111111111000", "00001111111111110000", "00000111111111100000", "00000011111111000000", "00000000000000000000"]) (Tile ["11111","10101","11011","10101","11111"])
-question10 inp1 inp2 = prettyPrint $ inp1
-
+question10 inp1 inp2 = prettyPrint $ tile6
+	where tile1 = createSubTile inp1 0 0 999999 12
+	      tile2 = createSubTile inp1 0 12 12 5
+	      tile3 = createSubTile inp1 17 12 999999 5
+	      tile4 = createSubTile inp1 0 17 999999 999999
+	      tile5 = combineTilesRight (combineTilesRight tile2 inp2) tile3
+	      tile6 = combineTilesDown (combineTilesDown(tile1) (tile5)) tile4

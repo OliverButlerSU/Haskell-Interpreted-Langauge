@@ -1,0 +1,11 @@
+getTileFile tile1 inp1;
+getTileFile tile2 inp2;
+
+tile1 = createSubTile(inp1,0,0,999999,12)
+tile2 = createSubTile(inp1,0,12,12,5)
+tile3 = createSubTile(inp1,17,12,999999,5)
+tile4 = createSubTile(inp1,0,17,999999,999999)
+tile5 = combineTilesRight(combineTilesRight(tile2,inp2),tile3)
+tile6 = combineTilesDown(combineTilesDown(tile1,tile5),tile4)
+
+return tile6;
