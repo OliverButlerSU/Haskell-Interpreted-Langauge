@@ -100,6 +100,7 @@ negateTile (Tile x) = Tile (map negateRow x)
 	where negateRow = map (\x -> if x == '0' then '1' else '0')
 
 
+--Used to create a sub list
 createSubTile (Tile xs) (xPos) (yPos) xsize ysize = Tile (splitList yPos ysize $ map (splitList xPos xsize) xs)
 
 splitList startPos length xs = take (length) (drop (startPos) xs)
@@ -107,12 +108,9 @@ splitList startPos length xs = take (length) (drop (startPos) xs)
 removeLastTileLine (Tile xs) = Tile (take (length xs-1)xs)
 
 
---Used to Pretty Print a tile (OLD MAYBE USE THO??)
---prettyPrint :: TileExp -> IO ()
---prettyPrint (Tile [x]) = putStrLn $ id x
---prettyPrint (Tile (x:xs)) = do
---			putStrLn $ id x
---			prettyPrint (Tile xs)
+--Used to or tiles
+orTiles p q = negateTile( conjunctTiles (negateTile p) (negateTile q))
+
 
 --Used to Pretty Print a tile
 prettyPrint :: TileExp -> IO ()
