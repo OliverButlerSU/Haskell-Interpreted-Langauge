@@ -168,3 +168,26 @@ question5 (inp) = prettyPrint $ tile4
 		tile3 = duplicateTileRight (createSubTile inp 4 4 6 6) 3
 		tile4 = combineTilesDown (combineTilesDown tile1 tile2) tile3
 -}
+
+
+--question6 (Tile ["111","111","111"]) (Tile ["010","111"],"010") (Tile ["101,010,101"])
+question6 inp1 inp2 inp3 = prettyPrint $ inp1
+
+
+--question7 (Tile ["01","10"])
+question7 inp1 = prettyPrint $ inp1
+
+
+
+--question8 (Tile ["101","001","110"]) (Tile ["010","101","101"])
+question8 inp1 inp2 = prettyPrint $ inp1
+
+
+
+--question9 (Tile ["010","101","010"])
+question9 inp1 = prettyPrint $ inp1
+
+
+--question10 (Tile ["00000000000000000000", "00000011111111000000", "00000111111111100000", "00001111111111110000", "00011111111111111000", "00111001111110011100", "00111001111110011100", "00111111111111111100", "01111111111111111110", "01111111111111111110", "01111111111111111110", "01111111111111111110", "00111111111111111100", "00111001111111001100", "00111100000000011100", "00011111111111111000", "00001111111111110000", "00000111111111100000", "00000011111111000000", "00000000000000000000"]) (Tile ["11111","10101","11011","10101","11111"])
+question10 inp1 inp2 = prettyPrint $ inp1
+
