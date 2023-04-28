@@ -58,7 +58,7 @@ do
                 
                 [ -n "$(tail -c1 $out)" ] && echo >> $out
 
-				diff $out $outofficial > /dev/null
+				diff --strip-trailing-cr --strip $out $outofficial > /dev/null
 				if [ "$?" = 0 ]; then
 					passed=$((passed+1))
 					echo -e "  TEST PASSED" 
