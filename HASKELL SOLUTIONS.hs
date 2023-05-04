@@ -193,8 +193,39 @@ question7 inp1 = prettyPrint $ inp1
 
 
 
---question8 (Tile ["101","001","110"]) (Tile ["010","101","101"])
-question8 inp1 inp2 = prettyPrint $ inp1
+--question8 (Tile ["110","001","110"]) (Tile ["010","101","101"])
+--question8 (Tile ["1"]) (Tile ["0"])
+question8 blue green = prettyPrint $ finalTile
+    where green2Up = scaleTile green 2
+          greenDown = reflectTileX green
+          green2Down = reflectTileX green2Up
+          blueDown = reflectTileX blue
+          tile1 = combineTilesRight (combineTilesRight green2Down green2Down) (combineTilesDown greenDown blue)
+          tile2 = combineTilesDown (combineTilesDown greenDown blue) (blue)
+          tile3 = combineTilesDown (green2Down) (combineTilesRight blue green)
+          tile4 = combineTilesDown (combineTilesRight blue blue) green2Up
+          tile5 = combineTilesRight (combineTilesRight tile2 tile3) tile4
+          subTile1 = combineTilesDown tile1 tile5
+          tile6 = combineTilesRight (combineTilesDown greenDown blue) (combineTilesRight green2Down green2Down)
+          tile7 = combineTilesDown green2Down (combineTilesRight green blue)
+          tile8 = combineTilesRight (tile4) (combineTilesRight tile7 tile2)
+          subTile2 = combineTilesDown tile6 tile8
+          tile9 = combineTilesRight (combineTilesRight blueDown blueDown) greenDown
+          tile10 = combineTilesRight (combineTilesDown blueDown green) green2Up
+          tile11 = combineTilesRight (combineTilesDown greenDown blue) green2Down
+          subTile3 = combineTilesDown (combineTilesDown tile9 tile10) tile11
+          tile12 = combineTilesRight (combineTilesRight greenDown blueDown) blueDown
+          tile13 = combineTilesRight green2Up (combineTilesDown blueDown green)
+          tile14 = combineTilesRight green2Down (combineTilesDown greenDown blue)
+          subTile4 = combineTilesDown (combineTilesDown tile12 tile13) tile14
+          tileSubRow1 = combineTilesRight subTile3 subTile1
+          tileSubRow2 = combineTilesRight subTile2 subTile4
+          tileSubRow3 = combineTilesRight tileSubRow1 tileSubRow2
+          tileSubRowFinal = combineTilesRight (duplicateTileRight tileSubRow3 2) (combineTilesRight subTile3 subTile1)
+          finalTiles1 = combineTilesDown tileSubRowFinal (reflectTileX tileSubRowFinal)
+          finalTile = duplicateTileDown finalTiles1 4
+
+
 
 
 
