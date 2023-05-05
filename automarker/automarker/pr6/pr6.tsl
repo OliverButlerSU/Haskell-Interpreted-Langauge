@@ -17,7 +17,7 @@ firstTile = combineTilesRight(firstTile, inp1);
 
 -- Second Tile
 i = 0;
-secondTile = blankTile;
+secondTile = createBlankTile(inp1);
 while (i < 19) {
 	secondTile = combineTilesRight(secondTile, inp2);
 	secondTile = combineTilesRight(secondTile, inp3);
@@ -30,7 +30,8 @@ secondTile = combineTilesRight(secondTile, inp3);
 mainTile = combineTilesDown(firstTile, secondTile);
 
 j = 1;
-while (i < 55) {
+i=0;
+while (i < 56) {
 	if (j==1) {
 		tempTile = combineTilesRight(inp3, inp1);
 		tempTile = combineTilesRight(tempTile, inp2);
@@ -39,6 +40,7 @@ while (i < 55) {
 			tempTile = combineTilesRight(tempTile, inp3);	
 			tempTile = combineTilesRight(tempTile, inp1);	
 			tempTile = combineTilesRight(tempTile, inp2);	
+			k=k+1;
 		};
 		mainTile = combineTilesDown(mainTile, tempTile); 
 	} else { doNothing;};
@@ -51,6 +53,7 @@ while (i < 55) {
 			tempTile = combineTilesRight(tempTile, inp2);	
 			tempTile = combineTilesRight(tempTile, inp3);	
 			tempTile = combineTilesRight(tempTile, inp1);	
+			k=k+1;
 		};
 		mainTile = combineTilesDown(mainTile, tempTile); 
 	} else {doNothing;};
@@ -62,7 +65,8 @@ while (i < 55) {
 		while (k<19) {
 			tempTile = combineTilesRight(tempTile, inp1);	
 			tempTile = combineTilesRight(tempTile, inp2);	
-			tempTile = combineTilesRight(tempTile, inp3);	
+			tempTile = combineTilesRight(tempTile, inp3);
+			k=k+1;	
 		};
 		mainTile = combineTilesDown(mainTile, tempTile); 
 		j=0;
@@ -73,24 +77,31 @@ while (i < 55) {
 
 -- Second last tile
 secondLastTile = combineTilesRight(inp1, inp2);
+secondLastTile = combineTilesRight(secondLastTile, inp3);
 k=0;
 while (k<19) {
-	secondLastTile = combineTilesRight(secondLastTile, inp3);	
 	secondLastTile = combineTilesRight(secondLastTile, inp1);	
-	secondLastTile = combineTilesRight(secondLastTile, inp2);	
+	secondLastTile = combineTilesRight(secondLastTile, inp2);
+	if(k!=18){
+		secondLastTile = combineTilesRight(secondLastTile, inp3);
+	} else {doNothing;};	
+	
+	k=k+1;
 };
-secondLastTile = combineTilesRight(secondLastTile, blankTile);
 secondLastTile = combineTilesRight(secondLastTile, blankTile);
 
 -- Last tile
 lastTile = combineTilesRight(inp3, inp1);
-lastTile = combineTilesRight(lastTile, inp2);
 k=0;
 while (k<19) {
-	lastTile = combineTilesRight(lastTile, inp3);	
-	lastTile = combineTilesRight(lastTile, inp1);	
-	lastTile = combineTilesRight(lastTile, inp2);	
+	lastTile = combineTilesRight(lastTile, inp2);
+	lastTile = combineTilesRight(lastTile, inp3);
+	if(k!=18){
+		lastTile = combineTilesRight(lastTile, inp1);	
+	} else {doNothing;};
+	k=k+1;
 };
+lastTile = combineTilesRight(lastTile, blankTile);
 lastTile = combineTilesRight(lastTile, blankTile);
 
 mainTile = combineTilesDown(mainTile, secondLastTile);
