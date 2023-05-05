@@ -39,7 +39,7 @@ while (i < 55) {
 			tempTile = combineTilesRight(tempTile, inp3);	
 			tempTile = combineTilesRight(tempTile, inp1);	
 			tempTile = combineTilesRight(tempTile, inp2);	
-		};
+		} else {doNothing};
 		mainTile = combineTilesDown(mainTile, tempTile); 
 	};
 
@@ -53,7 +53,7 @@ while (i < 55) {
 			tempTile = combineTilesRight(tempTile, inp1);	
 		};
 		mainTile = combineTilesDown(mainTile, tempTile); 
-	};
+	} else {doNothing};
 
 	if (j==3) {
 		tempTile = combineTilesRight(inp1, inp2)
@@ -63,10 +63,10 @@ while (i < 55) {
 			tempTile = combineTilesRight(tempTile, inp1);	
 			tempTile = combineTilesRight(tempTile, inp2);	
 			tempTile = combineTilesRight(tempTile, inp3);	
-		};
+		}else {doNothing};
 		mainTile = combineTilesDown(mainTile, tempTile); 
 		j=0;
-	};
+	}else {doNothing};
 	j=j+1;
 	i=i+1;
 };
